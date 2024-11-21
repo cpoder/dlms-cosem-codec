@@ -29,7 +29,7 @@ public class Wrapper {
         log.info("Client Id: {}", clientId);
         int length = buffer.getShort();
         log.info("DLMS message size: {}", length);
-        decodeCosemPdu(buffer, data);
+        decodeCosemPdu(buffer.slice(), data);
     }
 
     public void decode(InputStream is, DlmsData data) {

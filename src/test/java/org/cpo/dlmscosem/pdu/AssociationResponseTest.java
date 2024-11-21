@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.ByteBuffer;
 
+import org.bouncycastle.asn1.DLTaggedObject;
 import org.cpo.dlmscosem.DlmsData;
 import org.cpo.dlmscosem.Wrapper;
 import org.junit.jupiter.api.Test;

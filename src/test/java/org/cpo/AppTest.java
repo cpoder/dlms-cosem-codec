@@ -1,23 +1,15 @@
 package org.cpo;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.nio.ByteBuffer;
 
 import org.cpo.dlmscosem.DlmsData;
-import org.cpo.dlmscosem.Obis;
 import org.cpo.dlmscosem.Wrapper;
-import org.cpo.dlmscosem.pdu.AssociationRequest;
-import org.cpo.dlmscosem.pdu.AssociationRequest.ApplicationContext;
-import org.cpo.dlmscosem.pdu.GetRequest;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.io.BaseEncoding;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 
 import lombok.extern.slf4j.Slf4j;
 

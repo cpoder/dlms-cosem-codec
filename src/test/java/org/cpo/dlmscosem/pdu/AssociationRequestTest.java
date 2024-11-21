@@ -2,7 +2,7 @@ package org.cpo.dlmscosem.pdu;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.cpo.dlmscosem.pdu.AssociationRequest.ApplicationContext;
+import org.cpo.dlmscosem.enums.ApplicationContext;
 import org.junit.jupiter.api.Test;
 
 import com.google.common.io.BaseEncoding;

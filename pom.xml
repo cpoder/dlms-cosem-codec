@@ -35,6 +35,11 @@
       <artifactId>logback-classic</artifactId>
       <version>1.5.12</version>
     </dependency>
+    <dependency>
+      <groupId>org.wso2.orbit.org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk18on</artifactId>
+      <version>1.77.0.wso2v1</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
