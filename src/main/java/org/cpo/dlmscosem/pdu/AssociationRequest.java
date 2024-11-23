@@ -6,16 +6,18 @@ import org.cpo.dlmscosem.enums.ConformanceBit;
 
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AssociationRequest {
-    public AssociationRequest(ByteArrayDataOutput buffer, String applicationContext) {
-        this(buffer, ApplicationContext.from(applicationContext));
+    public ByteArrayDataOutput getRequest(String applicationContext) {
+        return getRequest(ApplicationContext.from(applicationContext));
     }
 
-    public AssociationRequest(ByteArrayDataOutput buffer, ApplicationContext applicationContext) {
+    public ByteArrayDataOutput getRequest(ApplicationContext applicationContext) {
+        ByteArrayDataOutput buffer = ByteStreams.newDataOutput();
         buffer.write(CosemPdu.ASSOCIATION_REQUEST.code);
         buffer.write(0x1d);
         // Application Context Name
@@ -47,5 +49,7 @@ public class AssociationRequest {
         // Max PDU size
         buffer.write(0xff);
         buffer.write(0xff);
+
+        return buffer;
     }
 }

@@ -4,23 +4,26 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.google.common.io.BaseEncoding;
 
 import lombok.Data;
 
 @Data
 @JsonInclude(Include.NON_NULL)
 public class DlmsData {
-    private DataType dataType;
     private Object value;
+    private DataType dataType;
     private List<DlmsData> data;
 
     @Override
     public String toString() {
         String result = "";
-        if (dataType != null) {
-            result += dataType.name() + ": ";
+        result += (dataType != null ? dataType.name() : value.getClass().getSimpleName()) + ": ";
+        if (dataType != null && dataType == DataType.OCTET_STRING) {
+            result += new String((byte[]) getValue()) + BaseEncoding.base16().encode((byte[]) getValue());
+        } else {
+            result += getValue() + "\n";
         }
-        result += getValue() + "\n";
         if (data != null && !data.isEmpty()) {
             for (DlmsData child : data) {
                 result += indentChildren(child.toString());

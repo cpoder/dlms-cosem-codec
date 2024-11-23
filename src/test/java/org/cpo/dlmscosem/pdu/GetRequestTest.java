@@ -23,8 +23,7 @@ public class GetRequestTest {
     @Test
     public void testGetRequestNormal() {
         Wrapper wrapper = new Wrapper();
-        ByteArrayDataOutput dlmsFrame = ByteStreams.newDataOutput();
-        new GetRequest(dlmsFrame).getNormalRequest(15, Obis.ASSOCIATION_OBJECT, 2);
+        var dlmsFrame = new GetRequest().getNormalRequest(15, Obis.ASSOCIATION_OBJECT, 2);
         ByteArrayDataOutput buffer = ByteStreams.newDataOutput();
         wrapper.encode(buffer, 16, 1, dlmsFrame.toByteArray());
         log.info(BaseEncoding.base16().encode(buffer.toByteArray()));
@@ -35,8 +34,7 @@ public class GetRequestTest {
     public void testGetResponseAttribute() {
         Wrapper wrapper = new Wrapper();
         ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode("0001000100100009C401C100060000003E"));
-        DlmsData data = new DlmsData();
-        wrapper.decode(buffer, data);
+        DlmsData data = wrapper.decode(buffer);
         ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
             log.info(mapper.writeValueAsString(data));

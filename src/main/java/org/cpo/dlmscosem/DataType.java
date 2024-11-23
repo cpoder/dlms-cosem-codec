@@ -19,45 +19,48 @@ import lombok.extern.slf4j.Slf4j;
 public enum DataType {
     NULL_DATA((byte) 0) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            var data = new DlmsData();
             log.info("NULL_DATA");
             data.setDataType(NULL_DATA);
             data.setValue("NULL");
+            return data;
         }
     },
     ARRAY((byte) 1) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            var data = new DlmsData();
             byte size = buffer.get();
             log.info("ARRAY of {} elements", size);
             data.setDataType(ARRAY);
             data.setValue(size);
             data.setData(new LinkedList<>());
             for (int i = 0; i < size; i++) {
-                DlmsData child = new DlmsData();
-                DataType.valueOf(buffer.get()).process(buffer, child);
-                data.getData().add(child);
+                data.getData().add(DataType.valueOf(buffer.get()).process(buffer));
             }
+            return data;
         }
     },
     STRUCTURE((byte) 2) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             byte size = buffer.get();
             log.info("STRUCTURE of {} elements", size);
             data.setDataType(STRUCTURE);
             data.setValue(size);
             data.setData(new LinkedList<>());
             for (int i = 0; i < size; i++) {
-                DlmsData child = new DlmsData();
-                DataType.valueOf(buffer.get()).process(buffer, child);
-                data.getData().add(child);
+                data.getData().add(DataType.valueOf(buffer.get()).process(buffer));
             }
+            return data;
         }
     },
     BOOL((byte) 3) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             byte value = buffer.get();
             Boolean bool = false;
             if (value == 0x00) {
@@ -72,11 +75,13 @@ public enum DataType {
             data.setDataType(BOOL);
             data.setValue(bool);
             log.info("BOOL: {}", bool);
+            return data;
         }
     },
     BIT_STRING((byte) 4) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             // The first byte indicates the number of valid bits
             int bitLength = Byte.toUnsignedInt(buffer.get());
 
@@ -100,40 +105,48 @@ public enum DataType {
             data.setDataType(BIT_STRING);
             data.setValue(value);
             log.info("BIT_STRING: {}", value);
+            return data;
         }
     },
     DOUBLE_LONG((byte) 5) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int value = buffer.getInt();
             data.setDataType(DOUBLE_LONG);
             data.setValue(value);
             log.info("DOUBLE_LONG: {}", value);
+            return data;
         }
     },
     DOUBLE_LONG_UNSIGNED((byte) 6) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             long value = Integer.toUnsignedLong(buffer.getInt());
             data.setDataType(DOUBLE_LONG_UNSIGNED);
             data.setValue(value);
             log.info("DOUBLE_LONG_UNSIGNED: {}", value);
+            return data;
         }
     },
     OCTET_STRING((byte) 9) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int size = buffer.get();
             byte[] value = new byte[size];
             buffer.get(value);
             data.setDataType(OCTET_STRING);
-            data.setValue(new String(value));
+            data.setValue(value);
             log.info("OCTET_STRING: {} -> {}", BaseEncoding.base16().encode(value), new String(value));
+            return data;
         }
     },
     VISIBLE_STRING((byte) 10) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             // Read the length of the string
             int length = Byte.toUnsignedInt(buffer.get());
 
@@ -151,11 +164,13 @@ public enum DataType {
             data.setDataType(VISIBLE_STRING);
             data.setValue(value);
             log.info("VISIBLE_STRING: {}", value);
+            return data;
         }
     },
     UTF8_STRING((byte) 12) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             // Read the length of the string
             int length = Byte.toUnsignedInt(buffer.get());
 
@@ -173,11 +188,13 @@ public enum DataType {
             data.setDataType(VISIBLE_STRING);
             data.setValue(value);
             log.info("UTF8_STRING: {}", value);
+            return data;
         }
     },
     BCD((byte) 13) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             byte bcdByte = buffer.get();
             // Extract the high nibble (first digit) and low nibble (second digit)
             int highNibble = (bcdByte >> 4) & 0x0F;
@@ -185,67 +202,81 @@ public enum DataType {
             data.setDataType(BCD);
             data.setValue(highNibble * 10 + lowNibble);
             log.info("BCD: {}{}", highNibble, lowNibble);
+            return data;
         }
     },
     INTEGER((byte) 15) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int value = buffer.get();
             data.setDataType(INTEGER);
             data.setValue(value);
             log.info("INTEGER: {}", value);
+            return data;
         }
     },
     LONG_INTEGER((byte) 16) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int value = buffer.getShort();
             data.setDataType(LONG_INTEGER);
             data.setValue(value);
             log.info("LONG_INTEGER: {}", value);
+            return data;
         }
     },
     UNSIGNED((byte) 17) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int value = Byte.toUnsignedInt(buffer.get());
             data.setDataType(UNSIGNED);
             data.setValue(value);
             log.info("UNSIGNED: {}", value);
+            return data;
         }
     },
     LONG_UNSIGNED((byte) 18) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int value = Short.toUnsignedInt(buffer.getShort());
             data.setDataType(LONG_UNSIGNED);
             data.setValue(value);
             log.info("LONG_UNSIGNED: {}", value);
+            return data;
         }
     },
     COMPACT_ARRAY((byte) 19) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int numElements = Byte.toUnsignedInt(buffer.get());
             byte[] numbers = new byte[numElements];
             buffer.get(numbers);
             data.setDataType(COMPACT_ARRAY);
             data.setValue(numbers);
             log.info("COMPACT_ARRAY: {}", numbers);
+            return data;
         }
     },
     LONG64((byte) 20) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             long value = buffer.getLong();
             data.setDataType(LONG64);
             data.setValue(value);
             log.info("LONG64: {}", value);
+            return data;
         }
     },
     LONG64_UNSIGNED((byte) 21) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             // Initialize a BigDecimal to hold the final value
             BigDecimal value = BigDecimal.ZERO;
 
@@ -259,38 +290,46 @@ public enum DataType {
             data.setDataType(LONG64_UNSIGNED);
             data.setValue(value);
             log.info("LONG64_UNSIGNED: {}", value);
+            return data;
         }
     },
     ENUMERATE((byte) 22) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             byte enumValue = buffer.get();
             data.setDataType(ENUMERATE);
             data.setValue(enumValue);
             log.info("ENUMERATE: {}", enumValue);
+            return data;
         }
     },
     FLOAT32((byte) 23) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             float enumValue = buffer.getFloat();
             data.setDataType(FLOAT32);
             data.setValue(enumValue);
             log.info("FLOAT32: {}", enumValue);
+            return data;
         }
     },
     FLOAT64((byte) 24) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             double enumValue = buffer.getDouble();
             data.setDataType(FLOAT32);
             data.setValue(enumValue);
             log.info("FLOAT64: {}", enumValue);
+            return data;
         }
     },
     DATE_TIME((byte) 25) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int year = Short.toUnsignedInt(buffer.getShort()); // Bytes 0-1
             int month = Byte.toUnsignedInt(buffer.get()); // Byte 2
             int day = Byte.toUnsignedInt(buffer.get()); // Byte 3
@@ -318,11 +357,13 @@ public enum DataType {
             data.setDataType(DATE_TIME);
             data.setValue(dateTime);
             log.info("DATE_TIME: {}", dateTime);
+            return data;
         }
     },
     DATE((byte) 26) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int year = Short.toUnsignedInt(buffer.getShort()); // Bytes 0-1
             int month = Byte.toUnsignedInt(buffer.get()); // Byte 2
             int day = Byte.toUnsignedInt(buffer.get()); // Byte 3
@@ -338,11 +379,13 @@ public enum DataType {
             data.setDataType(DATE);
             data.setValue(dateTime);
             log.info("DATE: {}", dateTime);
+            return data;
         }
     },
     TIME((byte) 27) {
         @Override
-        public void process(ByteBuffer buffer, DlmsData data) {
+        public DlmsData process(ByteBuffer buffer) {
+            DlmsData data = new DlmsData();
             int hour = Byte.toUnsignedInt(buffer.get()); // Byte 0
             int minute = Byte.toUnsignedInt(buffer.get()); // Byte 1
             int second = Byte.toUnsignedInt(buffer.get()); // Byte 2
@@ -358,6 +401,7 @@ public enum DataType {
             data.setDataType(TIME);
             data.setValue(time);
             log.info("TIME: {}", time);
+            return data;
         }
     };
 
@@ -369,7 +413,7 @@ public enum DataType {
 
     static final Map<Byte, DataType> BY_VALUE = new HashMap<>();
 
-    public abstract void process(ByteBuffer buffer, DlmsData data);
+    public abstract DlmsData process(ByteBuffer buffer);
 
     static {
         for (DataType f : values()) {

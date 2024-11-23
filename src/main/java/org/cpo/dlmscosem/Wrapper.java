@@ -21,7 +21,7 @@ public class Wrapper {
         log.info("Sending frame {}", BaseEncoding.base16().encode(buffer.toByteArray()));
     }
 
-    public void decode(ByteBuffer buffer, DlmsData data) {
+    public DlmsData decode(ByteBuffer buffer) {
         buffer.getShort(); // version
         int serverId = buffer.getShort();
         log.info("Server Id: {}", serverId);
@@ -29,11 +29,12 @@ public class Wrapper {
         log.info("Client Id: {}", clientId);
         int length = buffer.getShort();
         log.info("DLMS message size: {}", length);
-        decodeCosemPdu(buffer.slice(), data);
+        return decodeCosemPdu(buffer.slice());
     }
 
-    public void decode(InputStream is, DlmsData data) {
+    public DlmsData decode(InputStream is) {
         ByteBuffer header;
+        DlmsData result = null;
         try {
             header = ByteBuffer.wrap(is.readNBytes(8));
             header.getShort(); // version
@@ -44,18 +45,26 @@ public class Wrapper {
             int length = header.getShort();
             log.info("DLMS message size: {}", length);
             ByteBuffer buffer = ByteBuffer.wrap(is.readNBytes(length));
-            decodeCosemPdu(buffer, data);
+            result = decodeCosemPdu(buffer);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return result;
     }
 
-    private void decodeCosemPdu(ByteBuffer buffer, DlmsData data) {
+    private DlmsData decodeCosemPdu(ByteBuffer buffer) {
+        DlmsData result = null;
         log.info("Receiving DLMS frame {}", BaseEncoding.base16().encode(buffer.array()));
         while (buffer.hasRemaining()) {
             byte code = buffer.get();
-            log.info("COSEM PDU is: {}", CosemPdu.valueOf(code));
-            CosemPdu.valueOf(code).decode(buffer, data);
+            var cosemPdu = CosemPdu.valueOf(code);
+            if (cosemPdu != null) {
+                log.info("COSEM PDU is: {}", CosemPdu.valueOf(code));
+                result = CosemPdu.valueOf(code).decode(buffer);
+            } else {
+                log.error("{} is not a know PDU code", Byte.toUnsignedInt(code));
+            }
         }
+        return result;
     }
 }
