@@ -1,4 +1,4 @@
-package org.cpo.dlmscosem.pdu;
+package org.cpo.dlmscosem.cosem.pdu;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -8,15 +8,19 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.cpo.dlmscosem.cosem.CosemPdu;
 import org.cpo.dlmscosem.enums.ApplicationContext;
 
 import com.google.common.io.BaseEncoding;
 
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
+@ToString
 public class AssociationResponse {
     private ApplicationContext applicationContext;
     private boolean associationResult;
@@ -52,10 +56,15 @@ public class AssociationResponse {
                         log.info("Association result is: {}", associationResult);
                         break;
                     case 3:
+                        log.info("{}", obj);
                         break;
                     case 9:
+                        log.info("{}", obj);
                         break;
                     case 30:
+                        ByteBuffer contextBuffer = ByteBuffer.wrap(DEROctetString.getInstance(obj).getOctets());
+                        var data = CosemPdu.valueOf(contextBuffer.get()).decode(contextBuffer);
+                        log.info("{}", data);
                 }
             }
         } catch (IOException e) {

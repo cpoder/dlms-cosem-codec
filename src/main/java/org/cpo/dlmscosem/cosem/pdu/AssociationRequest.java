@@ -1,6 +1,8 @@
-package org.cpo.dlmscosem.pdu;
+package org.cpo.dlmscosem.cosem.pdu;
 
-import org.cpo.dlmscosem.CosemPdu;
+import java.util.List;
+
+import org.cpo.dlmscosem.cosem.CosemPdu;
 import org.cpo.dlmscosem.enums.ApplicationContext;
 import org.cpo.dlmscosem.enums.ConformanceBit;
 
@@ -12,11 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AssociationRequest {
-    public ByteArrayDataOutput getRequest(String applicationContext) {
-        return getRequest(ApplicationContext.from(applicationContext));
+    public ByteArrayDataOutput getRequest(String applicationContext, List<ConformanceBit> conformanceBits) {
+        return getRequest(ApplicationContext.from(applicationContext), conformanceBits);
     }
 
-    public ByteArrayDataOutput getRequest(ApplicationContext applicationContext) {
+    public ByteArrayDataOutput getRequest(ApplicationContext applicationContext, List<ConformanceBit> conformanceBits) {
         ByteArrayDataOutput buffer = ByteStreams.newDataOutput();
         buffer.write(CosemPdu.ASSOCIATION_REQUEST.code);
         buffer.write(0x1d);
@@ -44,8 +46,9 @@ public class AssociationRequest {
         // Length
         buffer.write(4);
         // Proposed conformance bits (supported features)
-        buffer.writeInt(0x0060FEDF);
-        log.info(ConformanceBit.getCapabilities(0x0060FEDF));
+        int conformance = ConformanceBit.getConformanceBits(conformanceBits);
+        buffer.writeInt(conformance);
+        log.info(ConformanceBit.getCapabilities(conformance).toString());
         // Max PDU size
         buffer.write(0xff);
         buffer.write(0xff);

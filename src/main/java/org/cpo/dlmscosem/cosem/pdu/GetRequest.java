@@ -1,8 +1,8 @@
-package org.cpo.dlmscosem.pdu;
+package org.cpo.dlmscosem.cosem.pdu;
 
-import org.cpo.dlmscosem.CosemPdu;
 import org.cpo.dlmscosem.DataType;
 import org.cpo.dlmscosem.Obis;
+import org.cpo.dlmscosem.cosem.CosemPdu;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;

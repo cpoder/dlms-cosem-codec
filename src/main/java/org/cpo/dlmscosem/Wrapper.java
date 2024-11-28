@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+import org.cpo.dlmscosem.cosem.CosemPdu;
+
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteArrayDataOutput;
 

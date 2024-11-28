@@ -4,23 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum ConformanceBit {
-    GENERAL_PROTECTION(0x000002),
-    GENERAL_BLOCK_TRANSFER(0x000004),
-    DELTA_VALUE_ENCODING(0x000008),
-    ATTR0_SET(0x000020),
-    PRIORITY_MANAGEMENT(0x000040),
-    ATTR0_GET(0x000080),
-    BLOCK_TRANSFER_WITH_GET(0x000100),
-    BLOCK_TRANSFER_WITH_SET(0x000200),
-    BLOCK_TRANSFER_WITH_ACTION(0x000400),
-    MULTIPLE_REFERENCES(0x000800),
-    DATA_NOTIFICATION(0x001000),
-    ACCESS(0x002000),
-    GET(0x004000),
-    SET(0x008000),
-    SELECTIVE_ACCESS(0x010000),
-    EVENT_NOTIFICATION(0x020000),
-    ACTION(0x040000);
+    GENERAL_PROTECTION(1),
+    GENERAL_BLOCK_TRANSFER(2),
+    READ(3),
+    WRITE(4),
+    UNCONFIRMED_WRITE(5),
+    ATTR0_SET(8),
+    PRIORITY_MANAGEMENT(9),
+    ATTR0_GET(10),
+    BLOCK_TRANSFER_WITH_GET_OR_READ(11),
+    BLOCK_TRANSFER_WITH_SET_OR_WRITE(12),
+    BLOCK_TRANSFER_WITH_ACTION(13),
+    MULTIPLE_REFERENCES(14),
+    INFORMATION_REPORT(15),
+    DATA_NOTIFICATION(16),
+    ACCESS(17),
+    PARAMETERIZED_ACCESS(18),
+    GET(19),
+    SET(20),
+    SELECTIVE_ACCESS(21),
+    EVENT_NOTIFICATION(22),
+    ACTION(23);
 
     int value;
 
@@ -28,13 +32,25 @@ public enum ConformanceBit {
         this.value = value;
     }
 
-    public static String getCapabilities(int bits) {
-        List<String> list = new ArrayList<>();
+    public static List<ConformanceBit> getCapabilities(long bits) {
+        List<ConformanceBit> list = new ArrayList<>();
         for (var cb : values()) {
-            if ((cb.value & bits) > 0) {
-                list.add(cb.name());
+            // Beware! bits are in reversed order
+            long bit = Integer.toUnsignedLong(1 << (23 - cb.value));
+            if ((bit & bits) > 0) {
+                list.add(cb);
             }
         }
-        return String.join(", ", list);
+        return list;
+    }
+
+    public static int getConformanceBits(List<ConformanceBit> conformanceBits) {
+        int result = 0;
+
+        for (ConformanceBit conformanceBit : conformanceBits) {
+            result |= (1 << (23 - conformanceBit.value));
+        }
+
+        return result;
     }
 }

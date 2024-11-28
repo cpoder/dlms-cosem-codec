@@ -1,8 +1,8 @@
-package org.cpo.dlmscosem.pdu;
+package org.cpo.dlmscosem.cosem.pdu;
 
 import java.nio.ByteBuffer;
 
-import org.cpo.dlmscosem.CosemPdu;
+import org.cpo.dlmscosem.cosem.CosemPdu;
 
 import com.google.common.io.BaseEncoding;
 

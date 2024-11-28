@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import org.cpo.dlmscosem.DlmsData;
 import org.cpo.dlmscosem.Obis;
 import org.cpo.dlmscosem.Wrapper;
+import org.cpo.dlmscosem.cosem.pdu.GetRequest;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

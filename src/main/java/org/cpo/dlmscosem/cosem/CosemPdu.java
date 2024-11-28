@@ -1,12 +1,15 @@
-package org.cpo.dlmscosem;
+package org.cpo.dlmscosem.cosem;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.cpo.dlmscosem.pdu.AssociationResponse;
-import org.cpo.dlmscosem.pdu.GeneralBlockTransfer;
+import org.cpo.dlmscosem.DataType;
+import org.cpo.dlmscosem.DlmsData;
+import org.cpo.dlmscosem.cosem.pdu.AssociationResponse;
+import org.cpo.dlmscosem.cosem.pdu.GeneralBlockTransfer;
+import org.cpo.dlmscosem.cosem.pdu.InitiateResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,8 +39,9 @@ public enum CosemPdu {
     INITIATERESPONSE((byte) 0x08) {
         @Override
         public DlmsData decode(ByteBuffer buffer) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'process'");
+            var data = new DlmsData();
+            data.setValue(new InitiateResponse(buffer));
+            return data;
         }
     },
     READRESPONSE((byte) 0x0C) {
@@ -172,10 +176,7 @@ public enum CosemPdu {
             if (code == 0x01) { // GET_RESPONSE_NORMAL
                 byte invokeIdAndPriority = buffer.get();
                 log.info("invokeIdAndPriority: {} {}", invokeIdAndPriority & 0xf, invokeIdAndPriority);
-                var lastBlock = buffer.get();
-                if (lastBlock == 0) {
-                    log.info("This response has more blocks!");
-                }
+                buffer.get();
                 var listOfData = new ArrayList<DlmsData>();
                 while (buffer.hasRemaining()) {
                     byte b = buffer.get();
@@ -187,6 +188,12 @@ public enum CosemPdu {
                     }
                 }
                 data.setValue(listOfData);
+            } else if (code == 0x02) { // GET_RESPONSE_WITH_DATA_BLOCK
+                byte invokeIdAndPriority = buffer.get();
+                log.info("invokeIdAndPriority: {} {}", invokeIdAndPriority & 0xf, invokeIdAndPriority);
+            } else if (code == 0x03) { // GET_RESPONSE_WITH_LIST
+                byte invokeIdAndPriority = buffer.get();
+                log.info("invokeIdAndPriority: {} {}", invokeIdAndPriority & 0xf, invokeIdAndPriority);
             }
             return data;
         }
